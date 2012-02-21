@@ -1,0 +1,15 @@
+<use name="FWCore/Framework"/>
+<use name="FWCore/PluginManager"/>
+<use name="FWCore/ParameterSet"/>
+<use name="HLTrigger/HLTcore"/>
+<use name="DataFormats/EgammaCandidates"/>
+<use name="DataFormats/L1Trigger"/>
+<use name="DataFormats/Candidate"/>
+<use name="CondFormats/L1TObjects"/>
+<use name="CondFormats/DataRecord"/>
+<use name="RecoEcal/EgammaCoreTools"/>
+<flags EDM_PLUGIN="1"/>
+<export>
+   <lib name="1"/>
+</export>
+
