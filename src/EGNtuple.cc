@@ -1,38 +1,5 @@
 #include "EGNtuple.h"
 
-void setBranchAddresses(TTree* chain, EGNtuple& treeVars)
-{
-  chain -> SetBranchAddress("runId",       &treeVars.runId);
-  chain -> SetBranchAddress("lumiSection", &treeVars.lumiSection);
-  chain -> SetBranchAddress("orbit",       &treeVars.orbit);
-  chain -> SetBranchAddress("bx",          &treeVars.bx);
-  chain -> SetBranchAddress("eventId",     &treeVars.eventId);
-  
-  chain -> SetBranchAddress("nJets",       &treeVars.nJets       );
-  chain -> SetBranchAddress("nPhotons",    &treeVars.nPhotons    );
-  chain -> SetBranchAddress("nTracks",     &treeVars.nTracks       );
-
-  chain -> SetBranchAddress("jetPx",        treeVars.jetPx     );
-  chain -> SetBranchAddress("jetPy",        treeVars.jetPy     );
-  chain -> SetBranchAddress("jetPz",        treeVars.jetPz     );
-  chain -> SetBranchAddress("jetE",         treeVars.jetE      );
-  
-  chain -> SetBranchAddress("phoPx",        treeVars.phoPx     );
-  chain -> SetBranchAddress("phoPy",        treeVars.phoPy     );
-  chain -> SetBranchAddress("phoPz",        treeVars.phoPz     );
-  chain -> SetBranchAddress("phoE",         treeVars.phoE      );
-  chain -> SetBranchAddress("sMin",         treeVars.sMin      );
-  chain -> SetBranchAddress("sMaj",         treeVars.sMaj      );
-  chain -> SetBranchAddress("sTime",        treeVars.sTime     );
-
-  chain -> SetBranchAddress("trkPx",        treeVars.trkPx     );
-  chain -> SetBranchAddress("trkPy",        treeVars.trkPy     );
-  chain -> SetBranchAddress("trkPz",        treeVars.trkPz     );
-  chain -> SetBranchAddress("trkE",         treeVars.trkE      );
-  chain -> SetBranchAddress("dR",           treeVars.dR      );
-  
-}
-
 
 void setBranches(TTree* chain, EGNtuple& treeVars)
 {
@@ -91,16 +58,16 @@ void initializeBranches(TTree* chain, EGNtuple& treeVars) {
       treeVars.phoPy[i] = 0 ;
       treeVars.phoPz[i] = 0 ;
       treeVars.phoE[i] = 0 ;
-      treeVars.sMin[i] = 0 ;
-      treeVars.sMaj[i] = 0 ;
-      treeVars.sTime[i] = 0 ;
+      treeVars.sMin[i] = -99;
+      treeVars.sMaj[i] = -99 ;
+      treeVars.sTime[i] = -99 ;
   }
   for ( int i=0; i< MAXTRK; i++) {
       treeVars.trkPx[i] = 0 ;
       treeVars.trkPy[i] = 0 ;
       treeVars.trkPz[i] = 0 ;
       treeVars.trkE[i] = 0 ;
-      treeVars.dR[i] = 0 ;
+      treeVars.dR[i] = -1 ;
   }
 
 }

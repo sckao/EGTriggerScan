@@ -92,7 +92,8 @@ void EGTriggerScan::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
   iEvent.getByLabel( photonSrc , egCands);
 
   // get hold of collection of objects
-  Handle<reco::CaloJetCollection> jets;
+  //Handle<reco::CaloJetCollection> jets;
+  Handle<reco::PFJetCollection> jets;
   iEvent.getByLabel( jetSrc , jets);
 
   // get hold of collection of objects
@@ -104,43 +105,17 @@ void EGTriggerScan::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
   iEvent.getByLabel( rechitsEB,     rechitsEB_ );
   iEvent.getByLabel( rechitsEE,     rechitsEE_ );
 
-initializeBranches( theTree, leaves );
-
-  int nEg = 0 ;  
-  double maxPhoPt = 0 ;
-  LorentzVector phoP4 ;
+  int nEg_test = 0 ;
   for (reco::RecoEcalCandidateCollection::const_iterator it = egCands->begin(); it != egCands->end(); it++ ) {
       if( ( fabs( it->eta()) < 1.479 &&  it->et()  >= etcutEB ) || ( fabs( it->eta()) >= 1.479 &&  it->et()  >= etcutEE ) ){
-        leaves.phoPx[nEg] = it->p4().Px() ;
-	leaves.phoPy[nEg] = it->p4().Py() ;
-	leaves.phoPz[nEg] = it->p4().Pz() ;
-	leaves.phoE[nEg]  = it->p4().E() ;
-        if ( it->pt() > maxPhoPt ) {
-           maxPhoPt = it->pt() ;
-           phoP4 = LorentzVector( it->p4().Px(), it->p4().Py(), it->p4().Pz(), it->p4().E() );
-        }
-        nEg++;
-
-        // S_Minor Cuts from the seed cluster
-        reco::CaloClusterPtr SCseed = it->superCluster()->seed() ;
-        const EcalRecHitCollection* rechits = ( fabs( it->eta()) < 1.479 ) ? rechitsEB_.product() : rechitsEE_.product() ;
-
-        Cluster2ndMoments moments = EcalClusterTools::cluster2ndMoments(*SCseed, *rechits);
-        float sMin =  moments.sMin  ;
-        float sMaj =  moments.sMaj  ;
-
-        // seed Time 
-        pair<DetId, float> maxRH = EcalClusterTools::getMaximum( *SCseed, rechits );
-        DetId seedCrystalId = maxRH.first;
-        EcalRecHitCollection::const_iterator seedRH = rechits->find(seedCrystalId);
-        float seedTime = (float)seedRH->time();
-
-	leaves.sMin[nEg]  = sMin ;
-	leaves.sMaj[nEg]  = sMaj ;
-	leaves.sTime[nEg]  = seedTime ;
+        nEg_test++ ;
       }
+      if ( nEg_test > 0 ) break ;
   }
-  if ( nEg > 0 ) {
+ 
+  if ( nEg_test > 0  ) {
+
+     initializeBranches( theTree, leaves );
 
      leaves.bx          = iEvent.bunchCrossing();
      leaves.lumiSection = iEvent.id().luminosityBlock();
@@ -148,16 +123,55 @@ initializeBranches( theTree, leaves );
      leaves.runId       = iEvent.id ().run () ;
      leaves.eventId     = iEvent.id ().event () ;
 
+     int nEg = 0 ;  
+     double maxPhoPt = 0 ;
+     LorentzVector phoP4 ;
+     for (reco::RecoEcalCandidateCollection::const_iterator it = egCands->begin(); it != egCands->end(); it++ ) {
+         if( ( fabs( it->eta()) < 1.479 &&  it->et()  >= 30. ) || ( fabs( it->eta()) >= 1.479 &&  it->et()  >= 30. ) ){
+
+           leaves.phoPx[nEg] = it->p4().Px() ;
+	   leaves.phoPy[nEg] = it->p4().Py() ;
+	   leaves.phoPz[nEg] = it->p4().Pz() ;
+	   leaves.phoE[nEg]  = it->p4().E() ;
+	   if ( it->pt() > maxPhoPt ) {
+              maxPhoPt = it->pt() ;
+              phoP4 = LorentzVector( it->p4().Px(), it->p4().Py(), it->p4().Pz(), it->p4().E() );
+           }
+
+            // S_Minor Cuts from the seed cluster
+	    reco::CaloClusterPtr SCseed = it->superCluster()->seed() ;
+	    const EcalRecHitCollection* rechits = ( fabs( it->eta()) < 1.479 ) ? rechitsEB_.product() : rechitsEE_.product() ;
+
+	    Cluster2ndMoments moments = EcalClusterTools::cluster2ndMoments(*SCseed, *rechits);
+	    float sMin =  moments.sMin  ;
+	    float sMaj =  moments.sMaj  ;
+
+	    // seed Time 
+	    pair<DetId, float> maxRH = EcalClusterTools::getMaximum( *SCseed, rechits );
+	    DetId seedCrystalId = maxRH.first;
+	    EcalRecHitCollection::const_iterator seedRH = rechits->find(seedCrystalId);
+	    float seedTime = (float)seedRH->time();
+
+	    leaves.sMin[nEg]  = sMin ;
+	    leaves.sMaj[nEg]  = sMaj ;
+	    leaves.sTime[nEg]  = seedTime ;
+
+           nEg++;
+           if ( nEg >= MAXPHO ) break ;
+      }
+     }
      leaves.nPhotons = nEg ;
 
      int nJ = 0;
-     for (reco::CaloJetCollection::const_iterator it = jets->begin(); it != jets->end(); it++ )  {
+     //for (reco::CaloJetCollection::const_iterator it = jets->begin(); it != jets->end(); it++ )  {
+     for (reco::PFJetCollection::const_iterator it = jets->begin(); it != jets->end(); it++ )  {
          if (  it->pt() < jetPtCut ) continue ;
 	 leaves.jetPx[nJ] = it->p4().Px() ;
 	 leaves.jetPy[nJ] = it->p4().Py() ;
 	 leaves.jetPz[nJ] = it->p4().Pz() ;
 	 leaves.jetE[nJ]  = it->p4().E()  ;
 	 nJ++ ;
+         if ( nJ >= MAXJET ) break ;
      }
      leaves.nJets = nJ ;
 
@@ -174,6 +188,7 @@ initializeBranches( theTree, leaves );
          leaves.dR[nTrk] = dR ;
          //cout<<" trk"<< nTrk <<" dR = "<< dR <<endl ;
          nTrk++ ;
+         if ( nTrk >= MAXTRK ) break ;
      }
      leaves.nTracks = nTrk ;
      //cout<<" nTracks = "<< nTrk <<endl ;
