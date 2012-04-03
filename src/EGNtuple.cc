@@ -12,6 +12,7 @@ void setBranches(TTree* chain, EGNtuple& treeVars)
   chain -> Branch("nJets",       &treeVars.nJets,                "nJets/I");
   chain -> Branch("nPhotons",    &treeVars.nPhotons,             "nPhotons/I");
   chain -> Branch("nTracks",     &treeVars.nTracks,              "nTracks/I");
+  chain -> Branch("nPixels",     &treeVars.nPixels,              "nPixels/I");
 
   chain -> Branch("jetPx",        treeVars.jetPx,                 "jetPx[nJets]/F");
   chain -> Branch("jetPy",        treeVars.jetPy,                 "jetPy[nJets]/F");
@@ -26,11 +27,11 @@ void setBranches(TTree* chain, EGNtuple& treeVars)
   chain -> Branch("sMaj",         treeVars.sMaj,                  "sMaj[nPhotons]/F");
   chain -> Branch("sTime",        treeVars.sTime,                 "sTime[nPhotons]/F");
 
-  chain -> Branch("trkPx",        treeVars.trkPx,                 "trkPx[nTracks]/F");
-  chain -> Branch("trkPy",        treeVars.trkPy,                 "trkPy[nTracks]/F");
-  chain -> Branch("trkPz",        treeVars.trkPz,                 "trkPz[nTracks]/F");
-  chain -> Branch("trkE",         treeVars.trkE,                  "trkE[nTracks]/F");
-  chain -> Branch("dR",           treeVars.dR,                    "dR[nTracks]/F");
+  chain -> Branch("pxlPx",        treeVars.pxlPx,                 "pxlPx[nPixels]/F");
+  chain -> Branch("pxlPy",        treeVars.pxlPy,                 "pxlPy[nPixels]/F");
+  chain -> Branch("pxlPz",        treeVars.pxlPz,                 "pxlPz[nPixels]/F");
+  chain -> Branch("pxlE",         treeVars.pxlE,                  "pxlE[nPixels]/F");
+  chain -> Branch("nHits",        treeVars.nHits,                 "nHits[nPixels]/I");
 
 }
 
@@ -46,6 +47,7 @@ void initializeBranches(TTree* chain, EGNtuple& treeVars) {
   treeVars.nJets      = 0 ; 
   treeVars.nPhotons   = 0 ; 
   treeVars.nTracks    = 0 ; 
+  treeVars.nPixels    = 0 ; 
 
   for ( int i=0; i< MAXJET; i++) {
       treeVars.jetPx[i] = 0 ;
@@ -68,6 +70,13 @@ void initializeBranches(TTree* chain, EGNtuple& treeVars) {
       treeVars.trkPz[i] = 0 ;
       treeVars.trkE[i] = 0 ;
       treeVars.dR[i] = -1 ;
+  }
+  for ( int i=0; i< MAXTRK; i++) {
+      treeVars.pxlPx[i] = 0 ;
+      treeVars.pxlPy[i] = 0 ;
+      treeVars.pxlPz[i] = 0 ;
+      treeVars.pxlE[i] = 0 ;
+      treeVars.nHits[i] = 0 ;
   }
 
 }

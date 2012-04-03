@@ -10,7 +10,7 @@
 //
 // Original Author:  Shih-Chuan Kao
 //         Created:  Thu Feb  9 17:11:15 CST 2012
-// $Id$
+// $Id: EGTriggerScan.cc,v 1.2 2012/03/22 20:07:06 sckao Exp $
 //
 //
 #include "EGTriggerScan.h"
@@ -30,6 +30,7 @@ EGTriggerScan::EGTriggerScan(const edm::ParameterSet& iConfig)
   photonSrc     = iConfig.getParameter< edm::InputTag > ("photonSource");
   jetSrc        = iConfig.getParameter< edm::InputTag > ("jetSource");
   trackSrc      = iConfig.getParameter< edm::InputTag > ("trackSource");
+  pixelSrc      = iConfig.getParameter< edm::InputTag > ("pixelSource");
   etcutEB       = iConfig.getParameter<double> ("etcutEB");
   etcutEE       = iConfig.getParameter<double> ("etcutEE");
   nPhotons      = iConfig.getParameter<int> ("nPhotons");
@@ -99,6 +100,10 @@ void EGTriggerScan::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
   // get hold of collection of objects
   Handle<reco::TrackCollection> tracks;
   iEvent.getByLabel( trackSrc , tracks);
+
+  // get hold of collection of objects
+  Handle<reco::TrackCollection> pixels;
+  iEvent.getByLabel( pixelSrc , pixels);
 
   Handle<EcalRecHitCollection>      rechitsEB_ ;
   Handle<EcalRecHitCollection>      rechitsEE_ ;
@@ -192,6 +197,24 @@ void EGTriggerScan::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
      }
      leaves.nTracks = nTrk ;
      //cout<<" nTracks = "<< nTrk <<endl ;
+
+     int nPxl = 0 ;
+     for (reco::TrackCollection::const_iterator it = pixels->begin(); it != pixels->end(); it++ )  {
+         if ( it->pt() < pxlPtCut ) continue ;
+         LorentzVector pxlP4( it->px(), it->py(), it->pz(), it->p() ) ;
+         //double dR =  ROOT::Math::VectorUtil::DeltaR( pxlP4 , phoP4 ) ;
+
+	 leaves.pxlPx[nPxl] = it->px() ;
+	 leaves.pxlPy[nPxl] = it->py() ;
+	 leaves.pxlPz[nPxl] = it->pz() ;
+	 leaves.pxlE[nPxl]  = it->p()  ;
+         leaves.nHits[nPxl] = it->numberOfValidHits() ;
+         //cout<<" trk"<< nTrk <<" dR = "<< dR <<endl ;
+         nPxl++ ;
+         if ( nPxl >= MAXTRK ) break ;
+     }
+     leaves.nPixels = nPxl ;
+
      theTree->Fill();   
   }
 

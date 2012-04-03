@@ -38,6 +38,14 @@ struct EGNtuple
   float trkE[MAXTRK];
   float dR[MAXTRK];
 
+  int   nPixels ;
+  float pxlPx[MAXTRK];
+  float pxlPy[MAXTRK];
+  float pxlPz[MAXTRK];
+  float pxlE[MAXTRK];
+  float nHits[MAXTRK];
+  
+
 };
 
 

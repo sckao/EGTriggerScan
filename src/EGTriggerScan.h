@@ -16,7 +16,7 @@
 //
 // Original Author:  Shih-Chuan Kao
 //         Created:  Thu Feb  9 17:11:15 CST 2012
-// $Id$
+// $Id: EGTriggerScan.h,v 1.2 2012/03/22 20:07:07 sckao Exp $
 //
 //
 
@@ -88,6 +88,9 @@ class EGTriggerScan : public edm::EDAnalyzer {
       edm::InputTag jetSrc ;
       double jetPtCut ;
       int    nJets   ;
+      edm::InputTag pixelSrc ;
+      double pxlPtCut ;
+      int    nPixels   ;
       edm::InputTag trackSrc ;
       double trkPtCut ;
       int    nTracks   ;
